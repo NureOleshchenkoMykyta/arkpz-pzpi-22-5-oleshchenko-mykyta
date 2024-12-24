@@ -1,1 +1,729 @@
-
+Міністерство освіти та науки України
+Харківський національний університет радіоелектроніки
+Лабораторна робота №2
+з дисципліни: «Аналіз та рефакторинг коду»
+Виконав
+ст. гр. ПЗПІ-22-5
+Олещенко Микита Сергійович
+ 
+ Перевірив
+ Дашенков Д.С.
+Харків 2024
+Лабораторна робота №2
+ 
+ Мета: Розробити базу даних для серверної частини програмної 
+системи та прикладного програмного інтерфейсу.
+Хід роботи
+Проєкт розпочався з побудови UML-діаграми прецедентів, яка 
+описує функції системи та способи взаємодії користувачів із нею (Додаток 
+А).
+Наступним етапом було створення структури бази даних, яку 
+візуалізовано у вигляді ER-діаграми (Додаток Б). На її основі розроблено 
+схему бази даних у PostgreSQL з усіма необхідними таблицями та 
+зв’язками між ними (Додаток В).
+Серверну частину системи реалізовано за допомогою Python і 
+FastAPI. Для роботи з базою даних використовували SQLAlchemy як 
+ORM, а Alembic застосовували для управління міграціями. API тестували 
+через Swagger UI, який автоматично генерується FastAPI (Додаток Г).
+Архітектура системи побудована за трирівневим підходом:
+1. Клієнтський рівень: обробка HTTP-запитів до API.
+2. Серверний рівень: обробка логіки запитів у FastAPI.
+3. Рівень даних: PostgreSQL як СУБД для зберігання інформації з 
+використанням SQLAlchemy.
+Ключові технічні рішення:
+1. FastAPI:
+- Висока продуктивність та асинхронність.
+- Інтеграція з OpenAPI (Swagger UI).
+- Зручна валідація через Pydantic.
+2. SQLAlchemy:
+- Зручний ORM для роботи з базою даних.
+- Можливість складних SQL-запитів.
+3. Alembic, контроль версій змін у схемі бази даних.
+4. Валідація даних:
+- Перевірка вхідних даних через Pydantic.
+- Додаткові обмеження на рівні SQLAlchemy (унікальність, 
+обов'язковість значень).
+5. PostgreSQL:
+- Надійна та стабільна реляційна СУБД.
+- Підтримка складних запитів та масштабованість.
+Реалізований API підтримує CRUD-операції для роботи з даними, а 
+його специфікація представлена у Додатку Г. Тестування API виконували 
+через Swagger UI, перевіряючи коректність роботи всіх ендпоінтів і 
+валідацію даних.
+Основні фрагменти коду, що демонструють роботу серверної 
+частини з базою даних через SQLAlchemy та взаємодію серверної частини 
+з клієнтами через FastAPI подано у Додатку Д. 
+Висновок
+У ході лабораторної роботи було реалізовано основну мету —
+створення серверної частини та API для системи аналізу психоемоційного 
+стану людини. Розробка включала етапи від створення UML-діаграм до 
+документування API, що забезпечило чіткість процесу.
+Використання фреймворку FastAPI забезпечило гнучкість та 
+масштабованість системи. ORM SQLAlchemy дозволила ефективно 
+працювати з базою даних PostgreSQL, розміщеною в хмарі для зручного 
+доступу та підвищеної продуктивності.
+Документування API через Swagger спростило інтеграцію з 
+клієнтами, а публікація на GitHub зробила проєкт доступним для 
+подальшого розвитку. Загалом, лабораторна робота продемонструвала 
+ефективність сучасних методів розробки, що дозволяють створювати 
+масштабовані й надійні рішення.
+ДОДАТОК А
+UML діаграма прецендентів
+Рисунок А – UML Діаграма прецедентів
+ДОДАТОК Б
+ER Діаграма бази даних
+Рисунок Б – ER діаграма бази даних
+ДОДАТОК В
+Діаграма структури бази даних
+Рисунок В – Діаграма структури бази даних
+ДОДАТОК Г
+Специфікація API
+1. {
+2. "definitions": {},
+3. "info": {
+4. "description": 
+"\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0430\u0446\u0
+456\u044f \u0434\u043b\u044f API",
+5. "termsOfService": "/tos",
+6. "title": "API Documentation",
+7. "version": "1.0.0"
+8. },
+9. "paths": {
+10."/accounts": {
+11. "delete": {
+12. "operationId": 
+"\u0412\u0438\u0434\u0430\u043b\u0435\u043d\u043d\u044f 
+\u0430\u043a\u0430\u0443\u043d\u0442\u0430 \u043f\u043e e-mail",
+13. "parameters": [
+14. {
+15. "description": "E-mail 
+\u0430\u043a\u0430\u0443\u043d\u0442\u0430 \u0434\u043b\u044f 
+\u0432\u0438\u0434\u0430\u043b\u0435\u043d\u043d\u044f",
+16. "in": "query",
+17. "name": "email",
+18. "required": true,
+19. "type": "string"
+20. }
+21. ],
+22. "responses": {
+23. "200": {
+24. "description": "\u0410\u043a\u0430\u0443\u043d\u0442 
+\u0443\u0441\u043f\u0456\u0448\u043d\u043e 
+\u0432\u0438\u0434\u0430\u043b\u0435\u043d\u043e"
+25. },
+26. "400": {
+27. "description": "\u041f\u043e\u043c\u0438\u043b\u043a\u0430 
+\u043f\u0440\u0438 
+\u0432\u0438\u0434\u0430\u043b\u0435\u043d\u043d\u0456 
+\u0430\u043a\u0430\u0443\u043d\u0442\u0430"
+28. }
+29. },
+30. "summary": "delete_account",
+31. "tags": [
+32. "Account"
+33. ]
+34. },
+35. "get": {
+36. "operationId": "\u041e\u0442\u0440\u0438\u043c\u0430\u0442\u0438 
+\u0432\u0441\u0456 \u0430\u043a\u0430\u0443\u043d\u0442\u0438",
+37. "responses": {
+38. "200": {
+39. "description": "\u0421\u043f\u0438\u0441\u043e\u043a 
+\u0430\u043a\u0430\u0443\u043d\u0442\u0456\u0432",
+40. "schema": {
+41. "items": {
+42. "properties": {
+43. "AccountID": {
+44. "type": "integer"
+45. },
+46. "Email": {
+47. "type": "string"
+48. },
+49. "Name": {
+50. "type": "string"
+51. }
+52. },
+53. "type": "object"
+54. },
+55. "type": "array"
+56. }
+57. }
+58. },
+59. "summary": "get_all_accounts",
+60. "tags": [
+61. "Account"
+62. ]
+63. }
+64.},
+65."/accounts/{account_id}/notes": {
+66. "get": {
+67. "operationId": "\u041e\u0442\u0440\u0438\u043c\u0430\u0442\u0438 
+\u0432\u0441\u0456 \u043d\u043e\u0442\u0430\u0442\u043a\u0438 
+\u0434\u043b\u044f \u0430\u043a\u0430\u0443\u043d\u0442\u0430",
+68. "parameters": [
+69. {
+70. "description": "ID \u0430\u043a\u0430\u0443\u043d\u0442\u0430",
+71. "in": "path",
+72. "name": "account_id",
+73. "required": true,
+74. "type": "integer"
+75. }
+76. ],
+77. "responses": {
+78. "200": {
+79. "description": "\u0421\u043f\u0438\u0441\u043e\u043a 
+\u043d\u043e\u0442\u0430\u0442\u043e\u043a",
+80. "schema": {
+81. "items": {
+82. "properties": {
+83. "CreationDate": {
+84. "type": "string"
+85. },
+86. "NoteID": {
+87. "type": "integer"
+88. },
+89. "Text": {
+90. "type": "string"
+91. }
+92. },
+93. "type": "object"
+94. },
+95. "type": "array"
+96. }
+97. }
+98. },
+99. "summary": "get_notes",
+100. "tags": [
+101. "Notes"
+102. ]
+103. }
+104. },
+105. "/accounts/{email}/change-password": {
+106. "put": {
+107. "operationId": "\u0417\u043c\u0456\u043d\u0430 
+\u043f\u0430\u0440\u043e\u043b\u044f 
+\u0430\u043a\u0430\u0443\u043d\u0442\u0430",
+108. "parameters": [
+109. {
+110. "description": "Email 
+\u0430\u043a\u0430\u0443\u043d\u0442\u0430",
+111. "in": "path",
+112. "name": "email",
+113. "required": true,
+114. "type": "string"
+115. },
+116. {
+117. "in": "body",
+118. "name": "body",
+119. "required": true,
+120. "schema": {
+121. "properties": {
+122. "new_password": {
+123. "description": "\u041d\u043e\u0432\u0438\u0439 
+\u043f\u0430\u0440\u043e\u043b\u044c",
+124. "required": true,
+125. "type": "string"
+126. },
+127. "old_password": {
+128. "description": "\u0421\u0442\u0430\u0440\u0438\u0439 
+\u043f\u0430\u0440\u043e\u043b\u044c",
+129. "required": true,
+130. "type": "string"
+131. }
+132. },
+133. "type": "object"
+134. }
+135. }
+136. ],
+137. "responses": {
+138. "200": {
+139. "description": "\u041f\u0430\u0440\u043e\u043b\u044c 
+\u0443\u0441\u043f\u0456\u0448\u043d\u043e 
+\u0437\u043c\u0456\u043d\u0435\u043d\u043e"
+140. },
+141. "400": {
+142. "description": 
+"\u041d\u0435\u0432\u0456\u0440\u043d\u0438\u0439 
+\u0441\u0442\u0430\u0440\u0438\u0439 
+\u043f\u0430\u0440\u043e\u043b\u044c"
+143. }
+144. },
+145. "summary": "change_password",
+146. "tags": [
+147. "Account"
+148. ]
+149. }
+150. },
+151. "/login": {
+152. "post": {
+153. "operationId": "\u041b\u043e\u0433\u0456\u043d 
+\u043a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447\u04
+30",
+154. "parameters": [
+155. {
+156. "in": "body",
+157. "name": "body",
+158. "required": true,
+159. "schema": {
+160. "properties": {
+161. "email": {
+162. "description": 
+"\u0415\u043b\u0435\u043a\u0442\u0440\u043e\u043d\u043d\u0430 
+\u043f\u043e\u0448\u0442\u0430 
+\u043a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447\u04
+30",
+163. "example": "example@gmail.com",
+164. "type": "string"
+165. },
+166. "password": {
+167. "description": "\u041f\u0430\u0440\u043e\u043b\u044c 
+\u043a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447\u04
+30",
+168. "example": "password123",
+169. "type": "string"
+170. }
+171. },
+172. "type": "object"
+173. }
+174. }
+175. ],
+176. "responses": {
+177. "200": {
+178. "description": "\u041b\u043e\u0433\u0456\u043d 
+\u0443\u0441\u043f\u0456\u0448\u043d\u0438\u0439"
+179. },
+180. "400": {
+181. "description": 
+"\u041d\u0435\u043f\u0440\u0430\u0432\u0438\u043b\u044c\u043d\u0
+438\u0439 email \u0430\u0431\u043e 
+\u043f\u0430\u0440\u043e\u043b\u044c"
+182. }
+183. },
+184. "summary": "login",
+185. "tags": [
+186. "Account"
+187. ]
+188. }
+189. },
+190. "/notes": {
+191. "post": {
+192. "operationId": 
+"\u0421\u0442\u0432\u043e\u0440\u0438\u0442\u0438 
+\u043d\u043e\u0442\u0430\u0442\u043a\u0443",
+193. "parameters": [
+194. {
+195. "in": "body",
+196. "name": "body",
+197. "required": true,
+198. "schema": {
+199. "properties": {
+200. "account_id": {
+201. "description": "ID 
+\u0430\u043a\u0430\u0443\u043d\u0442\u0430",
+202. "example": 1,
+203. "type": "integer"
+204. },
+205. "text": {
+206. "description": "\u0422\u0435\u043a\u0441\u0442 
+\u043d\u043e\u0442\u0430\u0442\u043a\u0438",
+207. "example": "\u0426\u0435 \u043c\u043e\u044f 
+\u043d\u043e\u0442\u0430\u0442\u043a\u0430",
+208. "type": "string"
+209. }
+210. },
+211. "type": "object"
+212. }
+213. }
+214. ],
+215. "responses": {
+216. "200": {
+217. "description": 
+"\u041d\u043e\u0442\u0430\u0442\u043a\u0430 
+\u0443\u0441\u043f\u0456\u0448\u043d\u043e 
+\u0441\u0442\u0432\u043e\u0440\u0435\u043d\u0430"
+218. }
+219. },
+220. "summary": "create_note",
+221. "tags": [
+222. "Notes"
+223. ]
+224. }
+225. },
+226. "/notes/{note_id}": {
+227. "delete": {
+228. "operationId": " ",
+229. "parameters": [
+230. {
+231. "description": "ID 
+\u043d\u043e\u0442\u0430\u0442\u043a\u0438",
+232. "in": "path",
+233. "name": "note_id",
+234. "required": true,
+235. "type": "integer"
+236. }
+237. ],
+238. "responses": {
+239. "200": {
+240. "description": 
+"\u041d\u043e\u0442\u0430\u0442\u043a\u0430 
+\u0443\u0441\u043f\u0456\u0448\u043d\u043e 
+\u0432\u0438\u0434\u0430\u043b\u0435\u043d\u0430"
+241. }
+242. },
+243. "summary": "delete_note",
+244. "tags": [
+245. "Notes"
+246. ]
+247. },
+248. "put": {
+249. "operationId": "\u041e\u043d\u043e\u0432\u0438\u0442\u0438 
+\u043d\u043e\u0442\u0430\u0442\u043a\u0443",
+250. "parameters": [
+251. {
+252. "description": "ID 
+\u043d\u043e\u0442\u0430\u0442\u043a\u0438",
+253. "in": "path",
+254. "name": "note_id",
+255. "required": true,
+256. "type": "integer"
+257. },
+258. {
+259. "in": "body",
+260. "name": "body",
+261. "required": true,
+262. "schema": {
+263. "properties": {
+264. "text": {
+265. "description": "\u041d\u043e\u0432\u0438\u0439 
+\u0442\u0435\u043a\u0441\u0442 
+\u043d\u043e\u0442\u0430\u0442\u043a\u0438",
+266. "example": 
+"\u041e\u043d\u043e\u0432\u043b\u0435\u043d\u0438\u0439 
+\u0442\u0435\u043a\u0441\u0442 
+\u043d\u043e\u0442\u0430\u0442\u043a\u0438",
+267. "type": "string"
+268. }
+269. },
+270. "type": "object"
+271. }
+272. }
+273. ],
+274. "responses": {
+275. "200": {
+276. "description": 
+"\u041d\u043e\u0442\u0430\u0442\u043a\u0430 
+\u0443\u0441\u043f\u0456\u0448\u043d\u043e 
+\u043e\u043d\u043e\u0432\u043b\u0435\u043d\u0430"
+277. }
+278. },
+279. "summary": "update_note",
+280. "tags": [
+281. "Notes"
+282. ]
+283. }
+284. },
+285. "/register": {
+286. "post": {
+287. "operationId": 
+"\u0420\u0435\u0454\u0441\u0442\u0440\u0430\u0446\u0456\u044f 
+\u043d\u043e\u0432\u043e\u0433\u043e 
+\u0430\u043a\u0430\u0443\u043d\u0442\u0430",
+288. "parameters": [
+289. {
+290. "in": "body",
+291. "name": "body",
+292. "required": true,
+293. "schema": {
+294. "properties": {
+295. "email": {
+296. "description": 
+"\u0415\u043b\u0435\u043a\u0442\u0440\u043e\u043d\u043d\u0430 
+\u043f\u043e\u0448\u0442\u0430 
+\u043a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447\u04
+30",
+297. "example": "example@gmail.com",
+298. "type": "string"
+299. },
+300. "name": {
+301. "description": "\u0406\u043c'\u044f 
+\u043a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447\u04
+30",
+302. "example": "John Doe",
+303. "type": "string"
+304. },
+305. "password": {
+306. "description": "\u041f\u0430\u0440\u043e\u043b\u044c 
+\u043a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447\u04
+30",
+307. "example": "password123",
+308. "type": "string"
+309. }
+310. },
+311. "type": "object"
+312. }
+313. }
+314. ],
+315. "responses": {
+316. "200": {
+317. "description": "\u0410\u043a\u0430\u0443\u043d\u0442 
+\u0443\u0441\u043f\u0456\u0448\u043d\u043e 
+\u0441\u0442\u0432\u043e\u0440\u0435\u043d\u043e"
+318. },
+319. "400": {
+320. "description": 
+"\u041d\u0435\u0432\u0456\u0440\u043d\u0438\u0439 
+\u0437\u0430\u043f\u0438\u0442"
+321. }
+322. },
+323. "summary": "register",
+324. "tags": [
+325. "Account"
+326. ]
+327. }
+328. },
+329. "/results": {
+330. "delete": {
+331. "operationId": 
+"\u0412\u0438\u0434\u0430\u043b\u0438\u0442\u0438 
+\u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442 
+\u0430\u043d\u0430\u043b\u0456\u0437\u0443",
+332. "parameters": [
+333. {
+334. "description": "E-mail 
+\u0430\u043a\u0430\u0443\u043d\u0442\u0430",
+335. "in": "query",
+336. "name": "email",
+337. "required": true,
+338. "type": "string"
+339. },
+340. {
+341. "description": "ID 
+\u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442\u0443",
+342. "in": "query",
+343. "name": "result_id",
+344. "required": true,
+345. "type": "integer"
+346. }
+347. ],
+348. "responses": {
+349. "200": {
+350. "description": 
+"\u0420\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442 
+\u0443\u0441\u043f\u0456\u0448\u043d\u043e 
+\u0432\u0438\u0434\u0430\u043b\u0435\u043d\u0438\u0439"
+351. }
+352. },
+353. "summary": "delete_result",
+354. "tags": [
+355. "Results"
+356. ]
+357. },
+358. "get": {
+359. "operationId": 
+"\u041e\u0442\u0440\u0438\u043c\u0430\u0442\u0438 
+\u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442\u0438 
+\u0434\u043b\u044f \u0430\u043a\u0430\u0443\u043d\u0442\u0430",
+360. "parameters": [
+361. {
+362. "description": "E-mail 
+\u0430\u043a\u0430\u0443\u043d\u0442\u0430",
+363. "in": "query",
+364. "name": "email",
+365. "required": true,
+366. "type": "string"
+367. }
+368. ],
+369. "responses": {
+370. "200": {
+371. "description": "\u0421\u043f\u0438\u0441\u043e\u043a 
+\u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442\u0456\u04
+32",
+372. "schema": {
+373. "items": {
+374. "properties": {
+375. "AnalysisDate": {
+376. "type": "string"
+377. },
+378. "EmotionalState": {
+379. "type": "string"
+380. },
+381. "ResultID": {
+382. "type": "integer"
+383. },
+384. "StressLevel": {
+385. "type": "integer"
+386. }
+387. },
+388. "type": "object"
+389. },
+390. "type": "array"
+391. }
+392. }
+393. },
+394. "summary": "get_results",
+395. "tags": [
+396. "Results"
+397. ]
+398. },
+399. "post": {
+400. "operationId": "\u0414\u043e\u0434\u0430\u0442\u0438 
+\u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442 
+\u0430\u043d\u0430\u043b\u0456\u0437\u0443",
+401. "parameters": [
+402. {
+403. "description": "E-mail 
+\u0430\u043a\u0430\u0443\u043d\u0442\u0430 \u0434\u043b\u044f 
+\u0434\u043e\u0434\u0430\u0432\u0430\u043d\u043d\u044f 
+\u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442\u0443",
+404. "in": "query",
+405. "name": "email",
+406. "required": true,
+407. "type": "string"
+408. },
+409. {
+410. "in": "body",
+411. "name": "body",
+412. "required": true,
+413. "schema": {
+414. "properties": {
+415. "stress_level": {
+416. "description": "\u0420\u0456\u0432\u0435\u043d\u044c 
+\u0441\u0442\u0440\u0435\u0441\u0443",
+417. "example": 75,
+418. "type": "integer"
+419. }
+420. },
+421. "type": "object"
+422. }
+423. }
+424. ],
+425. "responses": {
+426. "200": {
+427. "description": 
+"\u0420\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442 
+\u0443\u0441\u043f\u0456\u0448\u043d\u043e 
+\u0434\u043e\u0434\u0430\u043d\u043e"
+428. }
+429. },
+430. "summary": "create_result",
+431. "tags": [
+432. "Results"
+433. ]
+434. },
+435. "put": {
+436. "operationId": "\u041e\u043d\u043e\u0432\u0438\u0442\u0438 
+\u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442 
+\u0430\u043d\u0430\u043b\u0456\u0437\u0443",
+437. "parameters": [
+438. {
+439. "description": "E-mail 
+\u0430\u043a\u0430\u0443\u043d\u0442\u0430",
+440. "in": "query",
+441. "name": "email",
+442. "required": true,
+443. "type": "string"
+444. },
+445. {
+446. "description": "ID 
+\u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442\u0443",
+447. "in": "query",
+448. "name": "result_id",
+449. "required": true,
+450. "type": "integer"
+451. },
+452. {
+453. "in": "body",
+454. "name": "body",
+455. "required": true,
+456. "schema": {
+457. "properties": {
+458. "stress_level": {
+459. "description": "\u041d\u043e\u0432\u0438\u0439 
+\u0440\u0456\u0432\u0435\u043d\u044c 
+\u0441\u0442\u0440\u0435\u0441\u0443",
+460. "example": 85,
+461. "type": "integer"
+462. }
+463. },
+464. "type": "object"
+465. }
+466. }
+467. ],
+468. "responses": {
+469. "200": {
+470. "description": 
+"\u0420\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442 
+\u0443\u0441\u043f\u0456\u0448\u043d\u043e 
+\u043e\u043d\u043e\u0432\u043b\u0435\u043d\u043e"
+471. }
+472. },
+473. "summary": "update_result",
+474. "tags": [
+475. "Results"
+476. ]
+477. }
+478. }
+479. },
+480. "swagger": "2.0"
+481. }
+ДОДАТОК Д
+Приклад програмного коду (Уривок з файлу app.py)
+1. @app.route('/register', methods=['POST'])
+2. def register():
+3. """
+4. register
+5. ---
+6. tags:
+7. - Account
+8. operationId: "Реєстрація нового акаунта"
+9. parameters:
+10. - name: body
+11. in: body
+12. required: true
+13. schema:
+14. type: object
+15. properties:
+16. email:
+17. type: string
+18. description: Електронна пошта користувача
+19. example: "example@gmail.com"
+20. password:
+21. type: string
+22. description: Пароль користувача
+23. example: "password123"
+24. name:
+25. type: string
+26. description: Ім'я користувача
+27. example: "John Doe"
+28.responses:
+29. 200:
+30. description: Акаунт успішно створено
+31. 400:
+32. description: Невірний запит
+33."""
+34.data = request.get_json()
+35.if not data:
+36. return jsonify({"error": "Invalid JSON"}), 400
+37.
+38.email = data.get('email')
+39.password = data.get('password')
+40.name = data.get('name')
+41.
+42.if not email or not password or not name:
+43. return jsonify({"error": "Поля email, password, and name повинні 
+бути заповнені"}), 400
+44.
+45.query = """
+46.INSERT INTO analysisstate.account (Email, Password, Name)
+47.VALUES (%s, %s, %s);
+48."""
+49.params = (email, password, name)
+50.
+51.execute_query(query, params)
+52.result = execute_query(query, params)
+53.if result is None:
+54. print("Запит виконаний успішно, але дані не повернуто.")
+55.else:
+56. print("Результат запиту:", result)
+57.return jsonify({"message": "Акаунт успішно створено"}), 200
+58.
